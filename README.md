@@ -37,8 +37,7 @@ Make sure you have the following installed:
 
 - **Python 3.x** (You can download it from [python.org](https://www.python.org/downloads/))
 - **Streamlit** (for building the web app)
-- **pygame** (for playing sound effects — removed in this version)
-- **gTTS** (for text-to-speech functionality — removed in this version)
+
 
 ---
 

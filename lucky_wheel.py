@@ -1,11 +1,10 @@
 import streamlit as st
 import random
 import time
-from gtts import gTTS
 import pygame
 import os
 
-# Try to initialize pygame.mixer with error handling
+# Initialize pygame mixer
 try:
     pygame.mixer.init()
 except pygame.error:
@@ -50,34 +49,6 @@ def play_sound(effect_path):
     else:
         st.warning("Audio is disabled, but the game still works!")
 
-# Function for Text-to-Speech announcement (only if pygame mixer is initialized)
-def speak_prize(prize_text):
-    if pygame.mixer:
-        try:
-            tts = gTTS(text=prize_text, lang='en')
-            filename = "prize.mp3"
-            tts.save(filename)
-
-            pygame.mixer.music.stop()
-            pygame.mixer.music.load(filename)
-            pygame.mixer.music.play()
-
-            # Wait until sound finishes
-            while pygame.mixer.music.get_busy():
-                time.sleep(0.1)
-
-            # After playing, unload the music to release file
-            pygame.mixer.music.unload()
-
-            # Now safe to delete
-            if os.path.exists(filename):
-                os.remove(filename)
-
-        except Exception as e:
-            st.error(f"Error with TTS: {str(e)}")
-    else:
-        st.warning(f"Audio is disabled, but here's your prize: {prize_text}")
-
 # Personalized greeting
 name = st.text_input("What's your name? (Optional)", "")
 if name:
@@ -106,9 +77,6 @@ with col2:
         st.markdown("---")
         st.balloons()
         st.success(f"🎉 **Congratulations!** You landed on: **{prize}**")
-
-        # Speak the prize
-        speak_prize(prize)
 
         # Show total spins
         st.markdown(f"**Total Spins Today:** {st.session_state.spins}")

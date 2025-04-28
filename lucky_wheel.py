@@ -1,14 +1,6 @@
 import streamlit as st
 import random
 import time
-import os
-
-# Check if pygame is available and if mixer can be initialized
-try:
-    import pygame
-    pygame.mixer.init()
-except (ImportError, pygame.error):
-    pygame = None  # Disable pygame if not available or if there's an error
 
 # App Title and Introduction
 st.title("🎡 Spin the Wheel of Fun!")
@@ -36,18 +28,6 @@ def spin_wheel():
     selected_prize = random.choice(prizes)
     return selected_prize
 
-# Function to play sound effect if pygame is available
-def play_sound(effect_path):
-    if pygame:
-        try:
-            pygame.mixer.music.stop()
-            pygame.mixer.music.load(effect_path)
-            pygame.mixer.music.play()
-        except Exception as e:
-            st.error(f"Error loading sound: {str(e)}")
-    else:
-        st.warning("Audio features are not available in this environment.")
-
 # Personalized greeting
 name = st.text_input("What's your name? (Optional)", "")
 if name:
@@ -65,9 +45,6 @@ col1, col2, col3 = st.columns([1, 3, 1])
 with col2:
     if st.button('🎯 Spin the Wheel!'):
         st.session_state.spins += 1
-
-        # Play initial sound effect
-        play_sound("mixkit-cheering-crowd-loud-whistle-610.wav")
 
         # Spin the wheel
         prize = spin_wheel()

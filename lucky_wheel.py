@@ -5,12 +5,12 @@ from gtts import gTTS
 import pygame
 import os
 
-# Initialize pygame mixer with exception handling
+# Try to initialize pygame.mixer with error handling
 try:
     pygame.mixer.init()
-except pygame.error as e:
-    st.warning("Audio features are disabled in this environment.")
-    pygame.mixer = None  # Disable pygame mixer in case of error
+except pygame.error:
+    st.warning("Audio features are not available in this environment.")
+    pygame.mixer = None  # Disable pygame mixer if it fails
 
 # App Title and Introduction
 st.title("🎡 Spin the Wheel of Fun!")
@@ -38,7 +38,7 @@ def spin_wheel():
     selected_prize = random.choice(prizes)
     return selected_prize
 
-# Function to play sound effect (with check if pygame is initialized)
+# Function to play sound effect (only if pygame mixer is initialized)
 def play_sound(effect_path):
     if pygame.mixer:
         try:
@@ -50,7 +50,7 @@ def play_sound(effect_path):
     else:
         st.warning("Audio is disabled, but the game still works!")
 
-# Function for Text-to-Speech announcement
+# Function for Text-to-Speech announcement (only if pygame mixer is initialized)
 def speak_prize(prize_text):
     if pygame.mixer:
         try:

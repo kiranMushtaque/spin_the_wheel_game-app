@@ -1,6 +1,3 @@
-
-
-
 import streamlit as st
 import random
 import time
@@ -8,8 +5,12 @@ from gtts import gTTS
 import pygame
 import os
 
-# Initialize pygame mixer
-pygame.mixer.init()
+# Initialize pygame mixer with exception handling
+try:
+    pygame.mixer.init()
+except pygame.error as e:
+    st.warning("Audio features are disabled in this environment.")
+    pygame.mixer = None  # Disable pygame mixer in case of error
 
 # App Title and Introduction
 st.title("🎡 Spin the Wheel of Fun!")
@@ -37,40 +38,45 @@ def spin_wheel():
     selected_prize = random.choice(prizes)
     return selected_prize
 
-# Function to play sound effect
+# Function to play sound effect (with check if pygame is initialized)
 def play_sound(effect_path):
-    try:
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load(effect_path)
-        pygame.mixer.music.play()
-    except Exception as e:
-        st.error(f"Error loading sound: {str(e)}")
+    if pygame.mixer:
+        try:
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load(effect_path)
+            pygame.mixer.music.play()
+        except Exception as e:
+            st.error(f"Error loading sound: {str(e)}")
+    else:
+        st.warning("Audio is disabled, but the game still works!")
 
 # Function for Text-to-Speech announcement
 def speak_prize(prize_text):
-    try:
-        tts = gTTS(text=prize_text, lang='en')
-        filename = "prize.mp3"
-        tts.save(filename)
+    if pygame.mixer:
+        try:
+            tts = gTTS(text=prize_text, lang='en')
+            filename = "prize.mp3"
+            tts.save(filename)
 
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load(filename)
-        pygame.mixer.music.play()
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load(filename)
+            pygame.mixer.music.play()
 
-        # Wait until sound finishes
-        while pygame.mixer.music.get_busy():
-            time.sleep(0.1)
+            # Wait until sound finishes
+            while pygame.mixer.music.get_busy():
+                time.sleep(0.1)
 
-        # After playing, unload the music to release file
-        pygame.mixer.music.unload()
+            # After playing, unload the music to release file
+            pygame.mixer.music.unload()
 
-        # Now safe to delete
-        if os.path.exists(filename):
-            os.remove(filename)
+            # Now safe to delete
+            if os.path.exists(filename):
+                os.remove(filename)
 
-    except Exception as e:
-        st.error(f"Error with TTS: {str(e)}")
-
+        except Exception as e:
+            st.error(f"Error with TTS: {str(e)}")
+    else:
+        st.warning(f"Audio is disabled, but here's your prize: {prize_text}")
 
 # Personalized greeting
 name = st.text_input("What's your name? (Optional)", "")
